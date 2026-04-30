@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DiagTrailer</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0c0f1a;
+            color: #fff;
+            min-height: 100vh;
+            max-width: 430px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .header {
+            padding: 18px 16px 14px;
+            background: #0c0f1a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #1e2235;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo { font-size: 21px; font-weight: 900; letter-spacing: -0.5px; }
+        .logo span { color: #f59e0b; }
+        .logo em { color: #fff; font-style: normal; }
+        .logo-sub { font-size: 11px; color: #555; margin-top: 2px; }
+        .header-badge {
+            background: rgba(245,158,11,0.12);
+            border: 1px solid rgba(245,158,11,0.25);
+            color: #f59e0b;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .screen { display: none; animation: fadeIn 0.2s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HOME */
+        .home-hero {
+            background: linear-gradient(135deg, #111520 0%, #161b2e 100%);
+            padding: 24px 16px 20px;
+            border-bottom: 1px solid #1e2235;
+        }
+        .home-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .home-title span { color: #f59e0b; }
+        .home-desc { font-size: 13px; color: #6b7280; line-height: 1.5; }
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 20px 16px 10px;
+        }
+        .symptoms-grid {
+            padding: 0 12px 32px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .symptom-card {
+            background: #111520;
+            border-radius: 14px;
+            padding: 16px 14px;
+            cursor: pointer;
+            border: 1.5px solid #1e2235;
+            transition: all 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .symptom-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: 14px 14px 0 0;
+        }
+        .symptom-card.red::before { background: #ef4444; }
+        .symptom-card.yellow::before { background: #f59e0b; }
+        .symptom-card.blue::before { background: #3b82f6; }
+        .symptom-card.green::before { background: #10b981; }
+        .symptom-card:active { transform: scale(0.96); border-color: #f59e0b; background: #161b2e; }
+        .symptom-icon { font-size: 26px; margin-bottom: 10px; display: block; }
+        .symptom-label { font-size: 13px; font-weight: 700; color: #e5e7eb; line-height: 1.35; }
+        .symptom-sub { font-size: 11px; color: #4b5563; margin-top: 3px; }
+
+        /* QUESTIONS */
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 12px;
+        }
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #f59e0b;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 0;
+        }
+        .progress-wrap { flex: 1; }
+        .progress-bar {
+            height: 3px;
+            background: #1e2235;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .progress-label { font-size: 10px; color: #4b5563; text-align: right; margin-top: 4px; }
+        .question-wrapper { padding: 8px 16px 32px; }
+        .q-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245,158,11,0.1);
+            color: #f59e0b;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .question-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #f9fafb;
+            line-height: 1.35;
+            margin-bottom: 28px;
+        }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn {
+            background: #111520;
+            border: 1.5px solid #1e2235;
+            border-radius: 14px;
+            padding: 16px 18px;
+            text-align: left;
+            color: #d1d5db;
+            font-size: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            line-height: 1.4;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .option-btn:active { background: rgba(245,158,11,0.1); border-color: #f59e0b; color: #fff; }
+        .option-arrow { color: #374151; font-size: 16px; flex-shrink: 0; }
+
+        /* RESULT */
+        .result-hero { padding: 20px 16px 16px; }
+        .sev-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+        .sev-badge.green { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+        .sev-badge.warning { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+        .sev-badge.danger { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+        .result-title { font-size: 23px; font-weight: 900; color: #f9fafb; line-height: 1.2; }
+        .sec-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 0 16px;
+            margin: 20px 0 10px;
+        }
+        .causes-list { padding: 0 12px; display: flex; flex-direction: column; gap: 8px; }
+        .cause-card { background: #111520; border-radius: 14px; padding: 14px; border: 1px solid #1e2235; }
+        .cause-head { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+        .cause-num {
+            width: 26px; height: 26px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; flex-shrink: 0;
+        }
+        .cause-num.n1 { background: #f59e0b; color: #000; }
+        .cause-num.n2 { background: #374151; color: #9ca3af; }
+        .cause-num.n3 { background: #1f2937; color: #6b7280; }
+        .cause-name { font-size: 14px; font-weight: 700; color: #f3f4f6; }
+        .cause-desc { font-size: 13px; color: #6b7280; line-height: 1.55; }
+        .actions-list { padding: 0 12px; display: flex; flex-direction: column; gap: 8px; }
+        .action-item { display: flex; gap: 12px; background: #111520; border-radius: 14px; padding: 14px; border: 1px solid #1e2235; align-items: flex-start; }
+        .action-num {
+            width: 22px; height: 22px; border-radius: 6px;
+            background: rgba(245,158,11,0.15); color: #f59e0b;
+            font-size: 11px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+        }
+        .action-text { font-size: 14px; color: #9ca3af; line-height: 1.55; }
+        .note-box {
+            margin: 16px 12px;
+            background: rgba(245,158,11,0.05);
+            border: 1px solid rgba(245,158,11,0.15);
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+        .note-box p { font-size: 13px; color: #9ca3af; line-height: 1.65; }
+        .note-box strong { color: #f59e0b; }
+        .restart-btn {
+            margin: 20px 12px 40px;
+            background: #f59e0b;
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            padding: 17px;
+            font-size: 16px;
+            font-weight: 800;
+            width: calc(100% - 24px);
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: -0.2px;
+        }
+        .restart-btn:active { opacity: 0.85; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <div class="logo"><span>Diag</span><em>Trailer</em></div>
+        <div class="logo-sub">Cummins · Kenworth · Gondola</div>
+    </div>
+    <div class="header-badge">v1.0 Beta</div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="screen-home" class="screen active">
+    <div class="home-hero">
+        <div class="home-title">¿Qué falla tiene<br><span>el carro?</span></div>
+        <div class="home-desc">Toca el síntoma y te guío paso a paso al diagnóstico.</div>
+    </div>
+    <div class="section-label">Síntomas principales</div>
+    <div class="symptoms-grid">
+        <div class="symptom-card red" onclick="startDiag('perdida_fuerza')">
+            <span class="symptom-icon">📉</span>
+            <div class="symptom-label">Pérdida de fuerza</div>
+            <div class="symptom-sub">No jala igual</div>
+        </div>
+        <div class="symptom-card red" onclick="startDiag('derrame_liquidos')">
+            <span class="symptom-icon">💧</span>
+            <div class="symptom-label">Derrame de líquidos</div>
+            <div class="symptom-sub">Aceite, agua, diesel</div>
+        </div>
+        <div class="symptom-card yellow" onclick="startDiag('turbo')">
+            <span class="symptom-icon">🌀</span>
+            <div class="symptom-label">Turbo</div>
+            <div class="symptom-sub">Ruido, poca presión</div>
+        </div>
+        <div class="symptom-card yellow" onclick="startDiag('falla_electrica')">
+            <span class="symptom-icon">⚡</span>
+            <div class="symptom-label">Falla eléctrica</div>
+            <div class="symptom-sub">Módulo, actuadores</div>
+        </div>
+        <div class="symptom-card yellow" onclick="startDiag('sistema_aire')">
+            <span class="symptom-icon">💨</span>
+            <div class="symptom-label">Sistema de aire</div>
+            <div class="symptom-sub">Frenos, bolsas, fuga</div>
+        </div>
+        <div class="symptom-card red" onclick="startDiag('inyectores')">
+            <span class="symptom-icon">⚙️</span>
+            <div class="symptom-label">Inyectores</div>
+            <div class="symptom-sub">Humo, golpeteo</div>
+        </div>
+        <div class="symptom-card yellow" onclick="startDiag('clutch')">
+            <span class="symptom-icon">🔩</span>
+            <div class="symptom-label">Clutch</div>
+            <div class="symptom-sub">Patina, ruido, traba</div>
+        </div>
+        <div class="symptom-card yellow" onclick="startDiag('ejes_suspension')">
+            <span class="symptom-icon">🛞</span>
+            <div class="symptom-label">Ejes / suspensión</div>
+            <div class="symptom-sub">Muelles, crucetas</div>
+        </div>
+        <div class="symptom-card green" onclick="startDiag('bajo_rendimiento')">
+            <span class="symptom-icon">⛽</span>
+            <div class="symptom-label">Bajo rendimiento</div>
+            <div class="symptom-sub">Poco km/L</div>
+        </div>
+        <div class="symptom-card blue" onclick="startDiag('post_reparacion')">
+            <span class="symptom-icon">🔧</span>
+            <div class="symptom-label">Sin fuerza post-reparación</div>
+            <div class="symptom-sub">Recién arreglado</div>
+        </div>
+    </div>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div id="screen-question" class="screen">
+    <div class="nav-bar">
+        <div class="back-btn" onclick="goBack()">← Atrás</div>
+        <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:15%"></div></div>
+            <div class="progress-label" id="progress-label">Pregunta 1</div>
+        </div>
+    </div>
+    <div class="question-wrapper">
+        <div class="q-badge" id="q-badge">Diagnóstico</div>
+        <div class="question-text" id="q-text"></div>
+        <div class="options-list" id="q-options"></div>
+    </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="screen-result" class="screen">
+    <div class="nav-bar">
+        <div class="back-btn" onclick="goHome()">← Nueva consulta</div>
+    </div>
+    <div class="result-hero">
+        <div class="sev-badge" id="r-sev"></div>
+        <div class="result-title" id="r-title"></div>
+    </div>
+    <div class="sec-title">CAUSAS MÁS PROBABLES</div>
+    <div class="causes-list" id="r-causes"></div>
+    <div class="sec-title">QUÉ HACER PRIMERO</div>
+    <div class="actions-list" id="r-actions"></div>
+    <div class="note-box" id="r-note"></div>
+    <button class="restart-btn" onclick="goHome()">🔍 Diagnosticar otro problema</button>
+</div>
+
+<script>
+// ============================================================
+// DIAGNOSTIC TREES
+// ============================================================
+const diagData = {
+  perdida_fuerza: {
+    label: "Pérdida de fuerza",
+    questions: {
+      start: "pf1",
+      pf1: { text: "¿Cuándo se nota que pierde fuerza?", options: [
+        { label: "Solo en subidas o con carga pesada", next: "pf2" },
+        { label: "Todo el tiempo, desde que arranca", next: "pf3" },
+        { label: "De repente, viene y va", next: "pf4" }
+      ]},
+      pf2: { text: "¿Hay humo en el escape cuando pierde fuerza?", options: [
+        { label: "Sí, humo negro", next: "R_pf_turbo_aire" },
+        { label: "Sí, humo blanco o azuloso", next: "R_pf_liquido_interno" },
+        { label: "No hay humo visible", next: "R_pf_vgt" }
+      ]},
+      pf3: { text: "¿Hay alguna luz de falla o check prendida en el tablero?", options: [
+        { label: "Sí, hay luz encendida", next: "R_pf_modulo" },
+        { label: "No hay luz", next: "pf3b" }
+      ]},
+      pf3b: { text: "¿Cuándo se cambiaron los filtros (aire y combustible) por última vez?", options: [
+        { label: "Hace más de 15,000 km o no sé", next: "R_pf_filtros" },
+        { label: "Están recientes", next: "R_pf_inyectores" }
+      ]},
+      pf4: { text: "¿El turbo hace algún ruido diferente al normal?", options: [
+        { label: "Sí, chiflido o vibración rara", next: "R_pf_turbo_falla" },
+        { label: "No, suena normal", next: "R_pf_electronico" }
+      ]}
+    }
+  },
+  derrame_liquidos: {
+    label: "Derrame de líquidos",
+    questions: {
+      start: "dl1",
+      dl1: { text: "¿De qué color es el líquido que está derramando?", options: [
+        { label: "Negro o café oscuro → aceite", next: "dl2" },
+        { label: "Verde, naranja o rosa → anticongelante", next: "dl3" },
+        { label: "Transparente o diesel", next: "R_dl_combustible" },
+        { label: "Rojo o café claro → transmisión", next: "R_dl_transmision" }
+      ]},
+      dl2: { text: "¿Dónde está el charco de aceite debajo del carro?", options: [
+        { label: "Debajo del motor, parte frontal", next: "R_dl_reten_frente" },
+        { label: "Debajo del motor, parte trasera / campana", next: "R_dl_reten_trasero" },
+        { label: "En la parte de arriba del motor", next: "R_dl_junta_valvulas" }
+      ]},
+      dl3: { text: "¿Qué tan rápido está perdiendo el anticongelante?", options: [
+        { label: "Muy rápido, en horas se nota la baja de nivel", next: "R_dl_junta_cabeza" },
+        { label: "Poco a poco, en días", next: "R_dl_manguera" },
+        { label: "El aceite se ve lechoso o espumoso", next: "R_dl_camisa" }
+      ]}
+    }
+  },
+  turbo: {
+    label: "Turbo",
+    questions: {
+      start: "tb1",
+      tb1: { text: "¿Cuál es el síntoma principal del turbo?", options: [
+        { label: "Hace ruido: chiflido, roce o vibración", next: "tb2" },
+        { label: "Pierde fuerza pero no hace ruido", next: "R_tb_vgt_trabado" },
+        { label: "Hay aceite en la manguera de admisión", next: "R_tb_sello_aceite" }
+      ]},
+      tb2: { text: "¿Cuándo hace el ruido?", options: [
+        { label: "Siempre que el motor está encendido", next: "R_tb_cojinetes" },
+        { label: "Solo al acelerar fuerte", next: "R_tb_paletas" },
+        { label: "Al apagar el motor sigue girando mucho tiempo", next: "R_tb_cojinetes" }
+      ]}
+    }
+  },
+  falla_electrica: {
+    label: "Falla eléctrica",
+    questions: {
+      start: "fe1",
+      fe1: { text: "¿Cuál es el síntoma principal?", options: [
+        { label: "Hay código activo y limita la potencia", next: "R_fe_modulo_codigo" },
+        { label: "El acelerador no responde bien o falla", next: "R_fe_potenciometro" },
+        { label: "El freno de motor (Jake) no funciona", next: "R_fe_freno_motor" },
+        { label: "No arranca o se apaga solo en ruta", next: "fe2" }
+      ]},
+      fe2: { text: "¿Está encendida la luz de batería en el tablero?", options: [
+        { label: "Sí, hay luz de batería", next: "R_fe_bateria" },
+        { label: "No hay luz, se apaga sin aviso", next: "R_fe_modulo_prog" }
+      ]}
+    }
+  },
+  sistema_aire: {
+    label: "Sistema de aire",
+    questions: {
+      start: "sa1",
+      sa1: { text: "¿Cuál es el problema con el sistema de aire?", options: [
+        { label: "Los frenos no cargan / alarma de presión baja", next: "sa2" },
+        { label: "Las bolsas de suspensión no inflan bien", next: "R_sa_bolsas" },
+        { label: "Se escucha fuga de aire (silbido)", next: "R_sa_fuga" },
+        { label: "Los frenos se aplican solos", next: "R_sa_abs" }
+      ]},
+      sa2: { text: "¿El compresor genera algo de presión?", options: [
+        { label: "No genera nada aunque el motor esté encendido", next: "R_sa_compresor" },
+        { label: "Genera presión pero se va muy rápido", next: "R_sa_fuga" }
+      ]}
+    }
+  },
+  inyectores: {
+    label: "Inyectores",
+    questions: {
+      start: "in1",
+      in1: { text: "¿Cuál es el síntoma que notas?", options: [
+        { label: "Humo negro constante en el escape", next: "R_in_desgaste" },
+        { label: "Golpeteo o traqueteo en el motor", next: "R_in_golpeteo" },
+        { label: "Consumo de diesel muy alto sin razón", next: "R_in_fuga" },
+        { label: "Arranque difícil, especialmente en frío", next: "R_in_arranque" }
+      ]}
+    }
+  },
+  clutch: {
+    label: "Clutch",
+    questions: {
+      start: "cl1",
+      cl1: { text: "¿Cómo está fallando el clutch?", options: [
+        { label: "Patina: sube de revoluciones pero no jala parejo", next: "R_cl_desgaste" },
+        { label: "No libera: se traba para meter o sacar velocidad", next: "R_cl_no_libera" },
+        { label: "Hace ruido al pisarlo", next: "R_cl_ruido" },
+        { label: "El pedal va hasta el piso o sin resistencia", next: "R_cl_hidraulico" }
+      ]}
+    }
+  },
+  ejes_suspension: {
+    label: "Ejes / suspensión",
+    questions: {
+      start: "es1",
+      es1: { text: "¿Dónde está el problema?", options: [
+        { label: "Ruido en los ejes (al girar o en baches)", next: "es2" },
+        { label: "La suspensión está baja o desnivelada", next: "R_es_muelles" },
+        { label: "Vibración en el volante o en el carro", next: "R_es_balanceo" }
+      ]},
+      es2: { text: "¿Cuándo suena más?", options: [
+        { label: "Al hacer curvas", next: "R_es_crucetas" },
+        { label: "Siempre que va rodando", next: "R_es_bujes" },
+        { label: "Solo con carga pesada o en baches fuertes", next: "R_es_piernas" }
+      ]}
+    }
+  },
+  bajo_rendimiento: {
+    label: "Bajo rendimiento (km/L)",
+    questions: {
+      start: "br1",
+      br1: { text: "¿El bajo rendimiento es reciente o siempre ha sido así?", options: [
+        { label: "Era normal y de repente bajó", next: "br2" },
+        { label: "Siempre ha rendido poco", next: "R_br_operacion" }
+      ]},
+      br2: { text: "¿Hay humo negro en el escape?", options: [
+        { label: "Sí, hay humo negro al acelerar", next: "R_br_inyectores_turbo" },
+        { label: "No, el escape se ve limpio", next: "R_br_filtros" }
+      ]}
+    }
+  },
+  post_reparacion: {
+    label: "Sin fuerza post-reparación",
+    questions: {
+      start: "pr1",
+      pr1: { text: "¿Qué trabajo le hicieron al motor?", options: [
+        { label: "Cambio de inyectores o de cabeza", next: "R_pr_calibracion" },
+        { label: "Reparación completa: camisas, pistones, juntas", next: "R_pr_fugas" },
+        { label: "Cambio de turbo", next: "R_pr_turbo" }
+      ]}
+    }
+  }
+};
+
+// ============================================================
+// RESULTS DATABASE
+// ============================================================
+const results = {
+  R_pf_turbo_aire: {
+    sev: "warning", sevLabel: "🟡 Revisar pronto — puede seguir con cuidado",
+    title: "Turbo o falta de aire al motor",
+    causes: [
+      { n: "n1", name: "Filtro de aire tapado", desc: "El más fácil y barato de revisar. Si está negro o aplastado, cámbialo de inmediato." },
+      { n: "n2", name: "Turbo VGT con paletas trabadas", desc: "El turbo variable no está soplando a su capacidad. Puede ser carbón acumulado en las paletas." },
+      { n: "n3", name: "Manguera de turbo rota o suelta", desc: "Busca grietas o conexiones flojas entre el turbo y el intercooler." }
+    ],
+    actions: ["Revisa el filtro de aire primero — ábrelo y compáralo visualmente", "Inspecciona todas las mangueras del turbo buscando grietas o suelturas", "Escucha si el turbo chiría o vibra al acelerar fuerte", "Si todo está bien: llevar a taller para revisar actuador VGT con escáner Cummins INSITE"],
+    note: "El humo negro con pérdida de fuerza casi siempre es <strong>falta de aire</strong> al motor. No es emergencia inmediata pero sube el consumo de diesel y daña inyectores si se deja así."
+  },
+  R_pf_liquido_interno: {
+    sev: "danger", sevLabel: "🔴 PARA EL CARRO — riesgo de fundir el motor",
+    title: "Fuga interna de aceite o anticongelante",
+    causes: [
+      { n: "n1", name: "Junta de cabeza dañada", desc: "El anticongelante entra a los cilindros y sale como humo blanco con olor dulce." },
+      { n: "n2", name: "Camisa picada por cavitación", desc: "El anticongelante se mezcla con el aceite. Si el aceite está lechoso o espumoso, es esto." },
+      { n: "n3", name: "Sello de aceite del turbo roto", desc: "El humo azul al acelerar indica que el turbo manda aceite hacia la admisión." }
+    ],
+    actions: ["PARA EL CARRO — continuar puede fundir el motor completo", "Saca la varilla del aceite: si está espumoso o café con leche, hay mezcla con anticongelante", "Revisa el depósito de anticongelante: si tiene espuma o burbujas, confirma la falla", "Llama a que te traigan o remolquen — este motor necesita taller antes de volver a rodar"],
+    note: "El humo blanco con olor dulce es anticongelante quemándose en los cilindros. <strong>Si el carro sigue rodando puede destruir pistones, camisas y bielas.</strong> No arriesgar."
+  },
+  R_pf_vgt: {
+    sev: "warning", sevLabel: "🟡 Revisar con escáner",
+    title: "Actuador VGT o válvula EGR",
+    causes: [
+      { n: "n1", name: "Actuador del turbo VGT descalibrado o dañado", desc: "El actuador controla las paletas del turbo variable. Si falla, el turbo no alcanza su presión máxima." },
+      { n: "n2", name: "Válvula EGR tapada con carbón", desc: "La EGR acumula hollín con el tiempo. Cuando se traba abierta, mete gases quemados y roba potencia." },
+      { n: "n3", name: "Sensor MAP de presión de turbo", desc: "Si el sensor lee mal, el módulo no sabe cuánta presión hay y limita la potencia del motor." }
+    ],
+    actions: ["Conectar Cummins INSITE y revisar presión real del turbo en tiempo real bajo carga", "Si hay código P0299 (baja presión de turbo), confirma falla del actuador VGT", "Hacer procedimiento de calibración del VGT desde INSITE antes de cambiarlo", "Llevar a taller si la calibración no resuelve — puede requerir cambio de actuador"],
+    note: "El actuador del VGT en un Cummins ISX/X15 cuesta entre $3,000 y $8,000 pesos. <strong>Siempre hacer la calibración por software primero</strong> — muchas veces eso lo resuelve sin cambiar nada."
+  },
+  R_pf_modulo: {
+    sev: "warning", sevLabel: "🟡 Diagnóstico con Cummins INSITE",
+    title: "Módulo ECM limitando potencia por código activo",
+    causes: [
+      { n: "n1", name: "Código de protección del motor activo", desc: "El ECM limita la potencia cuando detecta un parámetro fuera de rango para proteger el motor." },
+      { n: "n2", name: "Sensor dando lectura incorrecta", desc: "Un sensor de presión, temperatura o posición con falla manda datos malos al módulo." },
+      { n: "n3", name: "Sensor de pedal / potenciómetro", desc: "Si el potenciómetro del acelerador está desgastado, el módulo no recibe la señal completa." }
+    ],
+    actions: ["Conectar Cummins INSITE para leer el código SPN y FMI exacto", "Anotar TODOS los códigos activos e inactivos — nunca borrar sin anotar", "El SPN identifica el componente, el FMI el tipo de falla — con ese dato se sabe exactamente qué cambiar", "Si no tienes INSITE, llevar a taller de diagnóstico Cummins"],
+    note: "El módulo guarda un historial completo de fallas. <strong>Nunca borrar códigos sin respaldarlos primero.</strong> Ese historial es como el expediente médico del motor."
+  },
+  R_pf_filtros: {
+    sev: "green", sevLabel: "🟢 Mantenimiento básico",
+    title: "Filtros tapados — mantenimiento pendiente",
+    causes: [
+      { n: "n1", name: "Filtro de aire tapado", desc: "El motor no recibe suficiente aire. Sin aire no hay combustión eficiente. Pérdida de potencia directa." },
+      { n: "n2", name: "Filtro de combustible tapado", desc: "El inyector no recibe el caudal de diesel que necesita. La potencia baja especialmente bajo carga." },
+      { n: "n3", name: "Separador de agua lleno o tapado", desc: "El agua en el combustible daña inyectores y puede apagar el motor en plena carretera." }
+    ],
+    actions: ["Cambiar filtro de aire primero — el más barato y rápido de cambiar", "Cambiar filtro primario y secundario de combustible", "Drenar el separador de agua y revisar si hay mucha acumulación", "Anotar los kilómetros del cambio para el próximo servicio preventivo"],
+    note: "En rutas con polvo de cemento o mina, los filtros se tapan mucho más rápido. <strong>Considera revisarlos cada 10,000 km en vez de 15,000</strong> dado el tipo de trabajo que hacen los carros."
+  },
+  R_pf_inyectores: {
+    sev: "warning", sevLabel: "🟡 Prueba en taller",
+    title: "Inyectores con desgaste interno",
+    causes: [
+      { n: "n1", name: "Inyectores con atomización deficiente", desc: "El diesel no se pulveriza bien y se quema de forma incompleta. El motor pierde eficiencia." },
+      { n: "n2", name: "Presión de riel de combustible baja", desc: "La bomba de alta presión puede estar desgastada y no mantiene la presión que los inyectores necesitan." },
+      { n: "n3", name: "Inyector con fuga interna", desc: "Un inyector que gotea internamente manda más diesel al retorno y desequilibra los cilindros." }
+    ],
+    actions: ["Hacer prueba de balance de cilindros con Cummins INSITE — identifica cuál inyector falla sin quitarlos", "Si el carro tiene más de 500,000 km con los mismos inyectores, ya es tiempo de revisarlos", "Los inyectores Cummins se pueden mandar a reconstruir — mucho más barato que nuevos", "Revisar también la presión del riel de combustible con manómetro"],
+    note: "Los inyectores Cummins son de los más durables del mercado <strong>si el diesel está limpio y los filtros al corriente.</strong> La suciedad y el agua en el combustible son los principales asesinos de inyectores."
+  },
+  R_pf_turbo_falla: {
+    sev: "danger", sevLabel: "🔴 Revisar antes de continuar",
+    title: "Turbo con falla mecánica interna",
+    causes: [
+      { n: "n1", name: "Cojinetes del turbo desgastados", desc: "El eje del turbo tiene juego. El chiflido o roce al girar indica que pronto puede romperse." },
+      { n: "n2", name: "Paletas del compresor golpeadas", desc: "Si entró algo por la admisión (tornillo, fragmento de filtro), las paletas se doblan." },
+      { n: "n3", name: "Falta de aceite al turbo", desc: "El turbo se lubrica con el aceite del motor. Si hay restricción en la línea de aceite, se destruye rápido." }
+    ],
+    actions: ["Para el carro y revisa el juego del eje del turbo — empuja de lado a lado, no debe moverse más de 1mm", "Revisa la línea de aceite del turbo — que no esté doblada o tapada", "Si hay ruido metálico fuerte: no arrancar — puede mandar fragmentos a los cilindros", "Llamar a taller o grúa según la gravedad del ruido"],
+    note: "Cuando un turbo se rompe adentro, los fragmentos de las paletas van directo a los cilindros. <strong>Un turbo destruido puede convertirse en un motor fundido si el carro sigue rodando.</strong>"
+  },
+  R_pf_electronico: {
+    sev: "warning", sevLabel: "🟡 Revisar con escáner",
+    title: "Falla intermitente en sensor o actuador",
+    causes: [
+      { n: "n1", name: "Sensor de posición del pedal (potenciómetro)", desc: "Si el sensor del acelerador da señal intermitente, el motor recibe señales de potencia variables." },
+      { n: "n2", name: "Conector eléctrico con corrosión o suelto", desc: "Los conectores expuestos a polvo y humedad de cementeras fallan de forma intermitente." },
+      { n: "n3", name: "Sensor de temperatura o presión fuera de rango", desc: "Un sensor leyendo mal puede hacer que el módulo limite la potencia como medida de protección." }
+    ],
+    actions: ["Conectar Cummins INSITE y revisar códigos archived (inactivos) — las fallas intermitentes dejan rastro", "Revisar los conectores del área de la cabeza del motor con limpiador de contactos eléctricos", "Monitorear los valores de sensores en tiempo real con INSITE mientras ocurre la falla", "Anotar exactamente cuándo pasa: ¿frío o caliente?, ¿con carga o vacío?, ¿a qué RPM?"],
+    note: "Las fallas intermitentes son las más difíciles de diagnosticar. <strong>Registrar las condiciones exactas</strong> cuando pasa la falla (temperatura, carga, RPM, clima) acelera enormemente el diagnóstico en taller."
+  },
+
+  // DERRAMES
+  R_dl_reten_frente: {
+    sev: "warning", sevLabel: "🟡 Programar en próximo servicio",
+    title: "Retén delantero del cigüeñal",
+    causes: [
+      { n: "n1", name: "Retén delantero del cigüeñal dañado", desc: "El retén de hule se endurece y agrieta con los años. El aceite sale por la parte frontal del motor." },
+      { n: "n2", name: "Junta de la tapa de distribución", desc: "La junta entre la tapa y el bloque puede filtrar aceite hacia la parte frontal." },
+      { n: "n3", name: "Bomba de agua con fuga en su sello", desc: "La bomba de agua puede confundirse con fuga de aceite si está cerca de la polea." }
+    ],
+    actions: ["Limpiar el área con desengrasante y dejar correr el motor para ubicar exactamente de dónde sale", "Si el aceite cae sobre la banda: cambiar retén pronto para no dañarla", "Revisar el nivel de aceite diariamente hasta resolver", "Programar cambio de retén en el próximo servicio — trabajo de medio día en taller"],
+    note: "Un retén que gotea no es emergencia si el nivel de aceite se mantiene. Pero si el aceite cae sobre la banda del alternador o la banda serpentina, <strong>puede resbalar y romperla, dejando el carro parado en carretera.</strong>"
+  },
+  R_dl_reten_trasero: {
+    sev: "warning", sevLabel: "🟡 Reparación mayor — programar",
+    title: "Retén trasero del cigüeñal",
+    causes: [
+      { n: "n1", name: "Retén trasero del cigüeñal", desc: "Sella el cigüeñal por el lado de la campana. Cuando falla, el aceite puede contaminar el disco de clutch." },
+      { n: "n2", name: "Junta del cárter inferior", desc: "La junta inferior del motor puede filtrar aceite, especialmente después de muchos kilómetros." },
+      { n: "n3", name: "Retén delantero de la transmisión", desc: "Puede confundirse con fuga del motor si está justo en la unión motor-transmisión." }
+    ],
+    actions: ["Revisar si el clutch tiene olor a quemado o está patinando — aceite en el clutch lo inutiliza", "Si hay aceite en el clutch: cambiar retén trasero Y clutch al mismo tiempo para no hacerlo dos veces", "Revisar nivel de aceite diariamente hasta la reparación", "Este trabajo requiere bajar la transmisión — trabajo de 1 a 2 días en taller"],
+    note: "<strong>Un clutch contaminado con aceite no pega aunque sea nuevo.</strong> El retén trasero es una reparación mayor, pero hacerlo bien incluye también revisar el estado del clutch mientras se tiene la transmisión abajo."
+  },
+  R_dl_junta_valvulas: {
+    sev: "green", sevLabel: "🟢 No urgente — fácil de reparar",
+    title: "Junta de tapa de válvulas",
+    causes: [
+      { n: "n1", name: "Junta de goma de la tapa de válvulas endurecida", desc: "La junta se endurece y agrieta con el calor. Es barata y se cambia fácil." },
+      { n: "n2", name: "Pernos de la tapa de válvulas flojos", desc: "A veces solo hay que apretar los tornillos de la tapa con la llave correcta." },
+      { n: "n3", name: "Breather (venteo del cárter) tapado", desc: "Si el breather está tapado, la presión interna del motor empuja aceite por cualquier sello." }
+    ],
+    actions: ["Primero: aprieta los pernos de la tapa de válvulas con llave torque al valor correcto", "Si persiste: cambiar la junta — pieza barata, trabajo de 1 hora en taller", "Revisar que el breather esté limpio y ventilando bien", "Limpiar el área y monitorear si la fuga vuelve"],
+    note: "Esta es la fuga más común e inofensiva del motor Cummins. El aceite que cae sobre el múltiple caliente hace humo que puede verse raro pero no es peligroso. <strong>Se atiende fácil, no hay que ignorarla.</strong>"
+  },
+  R_dl_junta_cabeza: {
+    sev: "danger", sevLabel: "🔴 PARA EL CARRO INMEDIATAMENTE",
+    title: "Junta de cabeza dañada — emergencia",
+    causes: [
+      { n: "n1", name: "Junta de cabeza quemada o perforada", desc: "Permite que el anticongelante entre a los cilindros. Sale como humo blanco con olor dulce." },
+      { n: "n2", name: "Cabeza del motor con grieta", desc: "Las grietas dejan pasar anticongelante al aceite o directo a los cilindros." },
+      { n: "n3", name: "Motor sobrecalentado anteriormente", desc: "Un solo sobrecalentamiento, aunque sea breve, puede dañar la junta de cabeza permanentemente." }
+    ],
+    actions: ["PARA EL CARRO — continuar destruirá el motor por completo", "Saca la varilla de aceite: si está café con leche o espumoso, hay mezcla — confirma la falla", "Revisa el depósito de anticongelante: burbujas o espuma = junta rota", "Llama a grúa — este motor necesita taller antes de volver a rodar"],
+    note: "La junta de cabeza en un Cummins es una reparación mayor. Requiere quitar la cabeza, rectificarla, cambiar todos los sellos internos. <strong>Si se ignora y el carro sigue rodando, se puede fundir el motor completo.</strong>"
+  },
+  R_dl_manguera: {
+    sev: "warning", sevLabel: "🟡 Revisar pronto",
+    title: "Fuga en manguera o conexión de anticongelante",
+    causes: [
+      { n: "n1", name: "Manguera de radiador agrietada o dura", desc: "Las mangueras de hule se endurecen y agrietan con el calor, especialmente en los extremos." },
+      { n: "n2", name: "Abrazadera de manguera floja", desc: "A veces solo hay que apretar la abrazadera. Revisión de 5 minutos." },
+      { n: "n3", name: "Bomba de agua filtrando por su sello", desc: "El sello de la bomba de agua se desgasta y deja salir anticongelante por el área del rodamiento." }
+    ],
+    actions: ["Revisa todas las mangueras del sistema de enfriamiento con el motor FRÍO para no quemarte", "Busca costras blancas o manchas cerca de las conexiones — ahí está la fuga exacta", "Aprieta las abrazaderas con desarmador o pinzas", "Manguera dura, rajada o blanda = cambio inmediato"],
+    note: "Las mangueras del motor Cummins se deben revisar cada 3-4 años aunque no tengan fuga visible. <strong>El anticongelante debe usarse siempre con inhibidor de cavitación SCA</strong> para proteger las camisas húmedas."
+  },
+  R_dl_camisa: {
+    sev: "danger", sevLabel: "🔴 PARA EL CARRO",
+    title: "Camisa con picadura — mezcla de aceite y anticongelante",
+    causes: [
+      { n: "n1", name: "Picadura en camisa del cilindro (cavitación)", desc: "Las camisas húmedas Cummins desarrollan picaduras por cavitación. El anticongelante entra al aceite." },
+      { n: "n2", name: "O-rings de la camisa dañados", desc: "Cada camisa tiene sellos de goma en su base. Con los años se endurecen y permiten la mezcla." },
+      { n: "n3", name: "Anticongelante sin inhibidor SCA", desc: "Usar agua de la llave sin aditivos acelera enormemente la corrosión interna de las camisas." }
+    ],
+    actions: ["PARA EL CARRO — el aceite mezclado con anticongelante destruye cojinetes en horas", "Saca la varilla: aceite espumoso o lechoso confirma la mezcla", "Este motor requiere apertura completa para cambiar camisas, O-rings y juntas", "Llevar a taller de rectificación especializado en Cummins"],
+    note: "Cummins recomienda usar <strong>SCA (Supplemental Coolant Additive)</strong> en el anticongelante para proteger las camisas húmedas de cavitación. Si usaste agua de la llave sin aditivos, la picadura es cuestión de tiempo."
+  },
+  R_dl_combustible: {
+    sev: "danger", sevLabel: "🔴 Riesgo de incendio",
+    title: "Fuga de combustible — peligro de incendio",
+    causes: [
+      { n: "n1", name: "Línea de retorno de inyectores fisurada", desc: "Las líneas de hule del retorno se agrietan por el calor y la presión del sistema." },
+      { n: "n2", name: "Junta del filtro de combustible floja", desc: "Las juntas de los vasos del filtro pueden filtrar si no están bien apretadas." },
+      { n: "n3", name: "Línea de alta presión con microfuga", desc: "Las tuercas de conexión de las líneas de acero pueden desarrollar grietas por vibración." }
+    ],
+    actions: ["PARA EL MOTOR — diesel cerca del motor caliente puede incendiarse", "No encender el motor hasta localizar y reparar la fuga", "Busca el origen con el motor FRÍO y buena iluminación", "Cualquier fuga de combustible cerca del motor o del escape es emergencia"],
+    note: "El punto de inflamación del diesel es bajo y el motor trabaja a alta temperatura. <strong>Una fuga de combustible nunca es un problema menor.</strong> Reparar antes de volver a la ruta."
+  },
+  R_dl_transmision: {
+    sev: "warning", sevLabel: "🟡 Revisar nivel y programar reparación",
+    title: "Fuga de aceite de transmisión o diferencial",
+    causes: [
+      { n: "n1", name: "Retén de salida de transmisión", desc: "Sella el eje de salida. El aceite ATF o de caja cae al piso cuando este retén falla." },
+      { n: "n2", name: "Retén de maza del diferencial", desc: "Los retenes de las mazas son muy comunes en unidades con mucho kilometraje y carga pesada." },
+      { n: "n3", name: "Tapón de drenaje del diferencial flojo", desc: "A veces es tan simple como un tapón que quedó flojo después del último cambio de aceite." }
+    ],
+    actions: ["Identificar si es rojo/café claro (transmisión) o café oscuro espeso (diferencial)", "Revisar nivel de aceite de la caja y diferencial — si baja rápido, no continuar", "Revisar tapón de drenaje y de nivel del diferencial", "Programar cambio de retén en taller — la transmisión seca se destruye muy rápido"],
+    note: "Los diferenciales de tractocamión no tienen varilla de nivel como el motor. Se revisan con el <strong>tapón de nivel lateral del diferencial</strong> — si sale aceite al abrir el tapón, el nivel está bien; si no sale, está bajo."
+  },
+
+  // TURBO
+  R_tb_vgt_trabado: {
+    sev: "warning", sevLabel: "🟡 Calibrar con Cummins INSITE",
+    title: "Turbo VGT con paletas trabadas",
+    causes: [
+      { n: "n1", name: "Carbón acumulado en las paletas VGT", desc: "Las paletas variables acumulan hollín y se traban. El turbo no puede variar su presión según la demanda." },
+      { n: "n2", name: "Actuador VGT descalibrado", desc: "El actuador eléctrico que mueve las paletas puede perder su posición de referencia." },
+      { n: "n3", name: "Sensor de posición del actuador VGT", desc: "Si el sensor falla, el módulo no sabe dónde están las paletas y no las puede controlar." }
+    ],
+    actions: ["Conectar Cummins INSITE y revisar posición real vs. comandada del VGT en tiempo real", "Si hay diferencia grande entre ambas, hacer procedimiento de calibración del VGT en INSITE", "Si hay código activo del actuador, evaluar limpieza antes de cambio", "Si la calibración no resuelve: cambio de actuador en taller"],
+    note: "El ISX de Cummins es conocido por este problema. <strong>El actuador del VGT cuesta entre $3,000 y $8,000 pesos pero muchas veces solo necesita la calibración por software.</strong> Siempre hacer eso primero."
+  },
+  R_tb_sello_aceite: {
+    sev: "warning", sevLabel: "🟡 Atender pronto",
+    title: "Sello de aceite del turbo roto",
+    causes: [
+      { n: "n1", name: "Sello de aceite del eje del turbo", desc: "El sello deja pasar aceite a la admisión. El motor quema su propio aceite y sale humo azul." },
+      { n: "n2", name: "Breather del cárter tapado", desc: "Si el venteo del cárter está tapado, la presión interna empuja aceite a través del turbo." },
+      { n: "n3", name: "Nivel de aceite por encima del máximo", desc: "Demasiado aceite también puede ser empujado al turbo por el sello bajo presión." }
+    ],
+    actions: ["Revisar que el breather del motor esté limpio y ventilando bien", "Verificar que el nivel de aceite no esté arriba de la marca máxima en la varilla", "Revisar que la línea de retorno de aceite del turbo al cárter no esté tapada", "Si persiste: el turbo necesita reconstrucción o reemplazo"],
+    note: "Un turbo con sello malo puede en casos extremos hacer que el motor <strong>se acelere solo por la combustión del aceite de admisión</strong> — situación muy peligrosa. Atender esta falla antes de que empeore."
+  },
+  R_tb_cojinetes: {
+    sev: "danger", sevLabel: "🔴 Cambiar turbo pronto",
+    title: "Cojinetes del turbo desgastados",
+    causes: [
+      { n: "n1", name: "Cojinetes de deslizamiento desgastados", desc: "El turbo gira a más de 100,000 RPM. Con cojinetes desgastados el eje roza y puede romperse." },
+      { n: "n2", name: "Falta de aceite en los primeros arranques", desc: "El turbo necesita aceite desde el primer segundo de encendido. Arranques en frío frecuentes lo dañan." },
+      { n: "n3", name: "Aceite sucio o degradado", desc: "Un cambio de aceite tardío deja partículas que rayan los cojinetes del turbo acelerando su desgaste." }
+    ],
+    actions: ["No apagar el motor inmediatamente después de trabajo duro — dejar al ralentí 3-5 minutos antes", "Revisar el juego radial del eje: más de 1mm de movimiento lateral = cambio urgente", "Planear cambio de turbo lo antes posible", "Al cambiar el turbo: cambiar también aceite y filtro de aceite, y cebar la línea de aceite antes del primer arranque"],
+    note: "Después de instalar un turbo nuevo, <strong>es obligatorio llenar la línea de aceite del turbo con aceite limpio ANTES de arrancar.</strong> Muchos turbos nuevos se destruyen en los primeros 30 segundos por no hacer esto."
+  },
+  R_tb_paletas: {
+    sev: "danger", sevLabel: "🔴 Revisar antes de arrancar",
+    title: "Paletas del turbo dañadas",
+    causes: [
+      { n: "n1", name: "Objeto extraño en la admisión", desc: "Un tornillo, fragmento de filtro o cualquier objeto sólido dobla las paletas instantáneamente." },
+      { n: "n2", name: "Filtro de aire roto o mal instalado", desc: "Si el elemento del filtro se rompe, pasa polvo abrasivo que destruye las paletas gradualmente." },
+      { n: "n3", name: "Fragmentos de carbón del EGR", desc: "En motores con mucho hollín, fragmentos de carbón del sistema EGR pueden golpear el turbo." }
+    ],
+    actions: ["Para el motor — paletas dañadas mandan fragmentos hacia los cilindros", "Revisar el filtro de aire: si está roto o mal instalado, esa es la fuente del daño", "Inspeccionar visualmente las paletas del compresor por la entrada de admisión", "El turbo necesita cambio si hay paletas dobladas o faltantes — no se reparan"],
+    note: "Los fragmentos de paletas que llegan a los cilindros pueden destruir pistones y camisas en segundos. <strong>Si el turbo hace ruido metálico repentino y fuerte, apaga el motor de inmediato.</strong>"
+  },
+
+  // ELÉCTRICAS
+  R_fe_modulo_codigo: {
+    sev: "warning", sevLabel: "🟡 Escáner Cummins INSITE",
+    title: "Código activo — módulo limitando potencia",
+    causes: [
+      { n: "n1", name: "Código de protección del motor activo", desc: "El ECM limita potencia cuando detecta algún parámetro fuera de rango, para proteger el motor." },
+      { n: "n2", name: "Sensor reportando valor fuera de especificación", desc: "Un sensor de presión, temperatura o posición con falla manda valores incorrectos al módulo." },
+      { n: "n3", name: "Múltiples códigos intermitentes acumulados", desc: "Varias fallas pequeñas juntas pueden resultar en limitación de potencia preventiva del módulo." }
+    ],
+    actions: ["Conectar Cummins INSITE para leer el SPN (componente) y FMI (tipo de falla) exacto de cada código", "Anotar todos los códigos activos e inactivos antes de borrar cualquiera", "Con el SPN y FMI se puede saber exactamente qué sensor o componente cambiar", "Si no tienes INSITE: llevar a taller de diagnóstico Cummins certificado"],
+    note: "El módulo Cummins guarda un historial completo de fallas con fecha y kilómetros. <strong>Ese historial es tan valioso como el diagnóstico actual.</strong> Pide siempre un reporte completo al taller, no solo la corrección de la falla."
+  },
+  R_fe_potenciometro: {
+    sev: "warning", sevLabel: "🟡 Revisar pronto",
+    title: "Potenciómetro del acelerador (TPS)",
+    causes: [
+      { n: "n1", name: "Potenciómetro del pedal desgastado", desc: "El sensor tiene un punto muerto por desgaste. El módulo recibe señal inconsistente y la potencia cae." },
+      { n: "n2", name: "Conector del pedal con corrosión", desc: "El conector debajo del pedal se oxida en ambientes de humedad y polvo de cemento." },
+      { n: "n3", name: "Cable del sensor dañado por roce", desc: "El cable que sale del pedal puede rozar con el piso de la cabina y dañarse lentamente." }
+    ],
+    actions: ["Con Cummins INSITE, ver el valor del sensor de pedal en tiempo real", "Al acelerar suavemente, el valor debe subir de forma lineal y continua — si hay saltos, es el sensor", "Revisar el conector debajo del pedal con limpiador de contactos", "El potenciómetro del pedal es pieza económica — cambio de menos de 1 hora en taller"],
+    note: "Este sensor es muy común en Kenworth con Cummins ISX. El código típico es <strong>SPN 091</strong>. Cuando falla, el acelerador puede responder de forma errática — acelera solo o no responde. Fácil y barato de resolver."
+  },
+  R_fe_freno_motor: {
+    sev: "green", sevLabel: "🟢 No urgente — pero importante",
+    title: "Freno de motor (Jake Brake) sin funcionar",
+    causes: [
+      { n: "n1", name: "Solenoides del freno de motor dañados", desc: "Los solenoides abren las válvulas del Jake Brake. Se desgastan o se cortocircuitan con el tiempo." },
+      { n: "n2", name: "Switch del freno de motor en cabina", desc: "El switch puede tener contacto intermitente o estar dañado internamente." },
+      { n: "n3", name: "Módulo desactivó el freno de motor", desc: "El ECM puede desactivar el Jake por un código de protección activo." }
+    ],
+    actions: ["Verificar que el switch del freno de motor en cabina esté activado y en buena posición", "Revisar el fusible del circuito del Jake Brake en la caja de fusibles", "Con INSITE verificar si el módulo tiene activo el freno de motor", "Si los solenoides fallan: se pueden cambiar individualmente sin desarmar el motor"],
+    note: "El freno de motor es <strong>crítico en bajadas largas con 40-50 toneladas de carga.</strong> Depender solo de las balatas en descensos sobrecalienta los frenos y puede causar pérdida total de frenado. Priorizar en rutas con serranía."
+  },
+  R_fe_bateria: {
+    sev: "danger", sevLabel: "🔴 Revisar antes de continuar",
+    title: "Batería o alternador con falla",
+    causes: [
+      { n: "n1", name: "Alternador no está cargando", desc: "Si el voltaje cae por debajo de 13V con el motor encendido, el alternador no está cargando." },
+      { n: "n2", name: "Batería sulfatada o descargada", desc: "Una batería mala en el par afecta todo el sistema eléctrico y causa apagados inesperados." },
+      { n: "n3", name: "Cable de tierra flojo o corrroído", desc: "Una tierra suelta hace que el sistema eléctrico se comporte de forma completamente errática." }
+    ],
+    actions: ["Con voltímetro: batería en reposo debe leer mínimo 12.6V", "Con motor encendido debe leer entre 13.8V y 14.5V — si no, el alternador falla", "Revisar terminales de batería — limpiar corrosión blanca o verde con agua con bicarbonato", "Revisar el cable de tierra principal del motor al chasis"],
+    note: "Los Kenworth con Cummins generalmente usan <strong>dos baterías en serie a 24V</strong> para el arranque. Una batería mala en el par hace que el sistema no arranque aunque la otra esté bien. <strong>Cambiarlas siempre en par.</strong>"
+  },
+  R_fe_modulo_prog: {
+    sev: "danger", sevLabel: "🔴 Requiere taller especializado",
+    title: "Falla en módulo ECM / programación",
+    causes: [
+      { n: "n1", name: "Módulo ECM con falla interna", desc: "Aunque poco común, el módulo puede fallar internamente sin generar código y causar apagados." },
+      { n: "n2", name: "Calibración del módulo corrompida", desc: "Una descarga fuerte de batería o tensión eléctrica puede corromper la programación del módulo." },
+      { n: "n3", name: "Falla en comunicación CAN Bus", desc: "Si el módulo pierde comunicación con otros módulos del camión, puede apagar el motor por seguridad." }
+    ],
+    actions: ["Intentar conectar Cummins INSITE — si no comunica con el módulo, confirma la falla", "Respaldar la calibración del módulo con INSITE ANTES de cualquier intervención", "Llevar a taller con equipo de programación Cummins certificado", "Si el módulo necesita reemplazo, instalar la calibración original en el módulo nuevo"],
+    note: "<strong>IMPORTANTE: Si tienes guardado el archivo .cpr de la calibración del módulo, el proceso es más rápido y económico.</strong> Si no tienes respaldo, el taller puede necesitar recuperarlo directamente de Cummins — tiene costo adicional y puede tardar días."
+  },
+
+  // AIRE
+  R_sa_bolsas: {
+    sev: "warning", sevLabel: "🟡 Revisar antes de cargar",
+    title: "Bolsas de aire de suspensión",
+    causes: [
+      { n: "n1", name: "Bolsa de aire rota o ponchada", desc: "Las bolsas de hule se agrietan por sobrecarga constante o por roce con alguna parte del chasis." },
+      { n: "n2", name: "Válvula de nivelación descalibrada", desc: "La válvula de nivelación controla el inflado automático. Descalibrada, la suspensión queda baja." },
+      { n: "n3", name: "Manguera de aire de la bolsa rota", desc: "Las mangueras de nylon que alimentan las bolsas pueden partirse por el frío o por roce." }
+    ],
+    actions: ["Con el carro en plano, revisar si alguna bolsa está visiblemente desinflada", "Escuchar si hay fuga de aire en el área de la suspensión trasera", "Revisar la válvula de nivelación — está en el puente del eje trasero", "No operar con carga hasta cambiar una bolsa rota — puede tirar el carro de un lado"],
+    note: "<strong>Una bolsa reventada con carga de cemento puede inclinar el carro peligrosamente.</strong> Revisar las bolsas visualmente antes de cada carga. Con el peso que manejan los carros de tu flota (40-50 ton), el desgaste es acelerado."
+  },
+  R_sa_fuga: {
+    sev: "warning", sevLabel: "🟡 Localizar y reparar",
+    title: "Fuga en el sistema de aire",
+    causes: [
+      { n: "n1", name: "Manguera de hule fisurada", desc: "Las mangueras del sistema de frenos se endurecen y agrietan, especialmente en invierno." },
+      { n: "n2", name: "Conector rápido (racor) suelto", desc: "Los conectores de plástico del sistema de aire se aflojan por la vibración constante." },
+      { n: "n3", name: "Válvula de purga de tanque de aire abierta", desc: "Las válvulas de drenaje manual a veces quedan parcialmente abiertas después de la purga." }
+    ],
+    actions: ["Con el sistema a presión, escuchar y sentir con la mano cada manguera y conector", "Usar agua jabonosa en las conexiones — las burbujas marcan exactamente dónde está la fuga", "Revisar las válvulas de purga de los tanques de aire que estén bien cerradas", "El sistema no debe perder más de 3 PSI por minuto con motor apagado y sin pisar frenos"],
+    note: "El sistema de frenos de aire trabaja a 120-130 PSI. Una fuga pequeña no para el carro inmediatamente, pero <strong>si baja de 60 PSI los frenos de resorte se aplican solos y el carro se detiene.</strong> En carretera eso es peligroso."
+  },
+  R_sa_abs: {
+    sev: "warning", sevLabel: "🟡 Diagnóstico con escáner ABS",
+    title: "Válvula ABS con falla",
+    causes: [
+      { n: "n1", name: "Válvula moduladora ABS dañada", desc: "Las válvulas del ABS se activan en cada frenada fuerte. El solenoide interno puede fallar con el tiempo." },
+      { n: "n2", name: "Sensor de velocidad de rueda con falla", desc: "Un sensor ABS con señal errónea puede activar el ABS en seco o impedirlo cuando se necesita." },
+      { n: "n3", name: "Código ABS guardado de falla anterior", desc: "A veces es solo un código de una falla ya resuelta. Se borra con escáner y no regresa." }
+    ],
+    actions: ["Revisar si está encendida la luz ABS en el tablero", "Con escáner ABS (Haldex o Bendix según el sistema), leer el código específico", "El código indica exactamente cuál válvula o sensor está fallando", "Revisar también las válvulas ABS del remolque (góndola) — tienen su propio sistema"],
+    note: "<strong>Los frenos ABS en una góndola cargada con 40-50 toneladas son críticos en pendientes y frenadas de emergencia.</strong> Una válvula ABS dañada puede causar frenos desiguales o bloqueo de ruedas. No posponer esta reparación."
+  },
+  R_sa_compresor: {
+    sev: "danger", sevLabel: "🔴 No operar el vehículo",
+    title: "Compresor de aire con falla",
+    causes: [
+      { n: "n1", name: "Compresor de aire con falla interna", desc: "Las válvulas internas del compresor se desgastan y dejan de comprimir el aire eficientemente." },
+      { n: "n2", name: "Válvula de descarga del compresor tapada", desc: "La válvula que manda el aire al sistema se puede tapar con aceite o carbón acumulado." },
+      { n: "n3", name: "Gobernador de presión (governor) dañado", desc: "El governor controla cuándo el compresor carga y cuándo descansa. Si falla, el sistema no carga." }
+    ],
+    actions: ["Sin presión de aire no hay frenos — NO mover el vehículo", "Con motor encendido, verificar si la aguja de presión de aire sube o se queda quieta", "Desconectar la línea de control del governor y ver si el compresor empieza a generar presión", "El carro requiere reparación en taller antes de cualquier movimiento"],
+    note: "El compresor de aire es el componente de seguridad más crítico del camión. <strong>Sin presión mínima de 90 PSI no hay frenos funcionales ni suspensión de aire.</strong> No mover el vehículo bajo ninguna circunstancia hasta tener presión."
+  },
+
+  // INYECTORES
+  R_in_desgaste: {
+    sev: "warning", sevLabel: "🟡 Diagnóstico con INSITE",
+    title: "Inyectores desgastados o sucios",
+    causes: [
+      { n: "n1", name: "Inyectores con atomización deficiente", desc: "El diesel no se pulveriza bien y se quema incompleto, generando humo negro y desperdicio de combustible." },
+      { n: "n2", name: "Filtro de combustible tapado", desc: "Antes de culpar a los inyectores, verificar que los filtros estén al corriente." },
+      { n: "n3", name: "Inyector con fuga interna de retorno", desc: "Un inyector que gotea internamente manda más diesel al retorno y desequilibra los cilindros." }
+    ],
+    actions: ["Cambiar filtros de combustible primero — solución más barata", "Con Cummins INSITE hacer prueba de balance de cilindros — identifica qué inyector falla sin quitarlos", "Hacer también prueba de retorno de inyectores con equipo especial", "Los inyectores Cummins se pueden mandar a reconstruir — mucho más barato que nuevos"],
+    note: "El humo negro constante en Cummins ISX casi siempre es <strong>inyectores o falta de aire (filtro/turbo).</strong> Hacer la prueba de balance de cilindros con INSITE antes de gastar en inyectores — muchas veces solo hay que cambiar filtros."
+  },
+  R_in_golpeteo: {
+    sev: "warning", sevLabel: "🟡 Diagnóstico urgente",
+    title: "Golpeteo en motor — posible inyector",
+    causes: [
+      { n: "n1", name: "Inyector con tiempo de inyección incorrecto", desc: "Si el inyector inyecta en el momento equivocado, produce un golpe característico en ese cilindro." },
+      { n: "n2", name: "Inyector mal asentado o suelto", desc: "Un inyector que no está bien apretado golpea contra la cabeza del motor." },
+      { n: "n3", name: "Detonación por combustible contaminado", desc: "Diesel con agua o de baja calidad puede causar detonación en los cilindros." }
+    ],
+    actions: ["Identificar qué cilindro golpea — apagar inyectores uno a uno con Cummins INSITE", "Al desactivar el cilindro que golpea, el ruido desaparece si es ese inyector", "Revisar si el diesel del último tanque fue de dudosa calidad", "No operar con golpeteo fuerte — puede dañar cabeza, biela o pistón"],
+    note: "Un leve golpeteo en Cummins en frío puede ser normal en algunas condiciones. <strong>Si el golpeteo persiste con el motor caliente, es diagnóstico urgente.</strong> El golpe fuerte de metal contra metal no debe ignorarse."
+  },
+  R_in_fuga: {
+    sev: "warning", sevLabel: "🟡 Prueba en taller",
+    title: "Inyector con fuga interna — consumo alto",
+    causes: [
+      { n: "n1", name: "Asiento del inyector desgastado", desc: "El sello interno del inyector deja pasar diesel al retorno en vez de a la cámara de combustión." },
+      { n: "n2", name: "Resorte del inyector débil", desc: "Si el resorte pierde tensión, el inyector no cierra completamente y hay fuga continua." },
+      { n: "n3", name: "Contaminación por partículas en el combustible", desc: "Partículas en el diesel rayan el asiento del inyector y crean la fuga con el tiempo." }
+    ],
+    actions: ["Hacer prueba de retorno de inyectores — medir cuánto diesel regresa de cada uno", "Si un inyector tiene retorno mayor que los demás, ese es el dañado", "Esta prueba se hace con motor encendido y equipo de medición especial", "Mandar reconstruir o cambiar el inyector con mayor retorno"],
+    note: "Una fuga interna de inyector no hace humo visible pero sí eleva el consumo de forma importante. <strong>En una flota de 6 unidades, una fuga en cada inyector puede representar decenas de miles de pesos en diesel extra al mes.</strong>"
+  },
+  R_in_arranque: {
+    sev: "green", sevLabel: "🟢 Revisar sistema de arranque en frío",
+    title: "Arranque difícil en frío",
+    causes: [
+      { n: "n1", name: "Calentadores de admisión sin funcionar", desc: "El Cummins tiene calentadores de aire de admisión para el frío. Si fallan, el arranque es muy difícil." },
+      { n: "n2", name: "Baterías con baja capacidad en frío", desc: "En invierno las baterías pierden hasta 30% de capacidad. Si el motor arranca lento, los inyectores no reciben presión suficiente." },
+      { n: "n3", name: "Inyectores con presión de apertura baja", desc: "Los inyectores desgastados tienen menor presión de apertura y en frío el diesel no atomiza bien." }
+    ],
+    actions: ["Verificar el voltaje de las baterías en frío — mínimo 12.4V en reposo", "Con Cummins INSITE revisar si los calentadores de admisión están funcionando correctamente", "Esperar a que el indicador de calentadores en el tablero se apague antes de arrancar", "NUNCA usar éter (aerosol de arranque) en motores Cummins con calentadores — los daña"],
+    note: "<strong>El éter (aerosol de arranque) está prohibido en motores Cummins con calentadores de admisión.</strong> Puede causar detonación severa que rompe pistones. Cummins lo dice claramente en su manual de operación."
+  },
+
+  // CLUTCH
+  R_cl_desgaste: {
+    sev: "warning", sevLabel: "🟡 Cambiar pronto — no dejar a última hora",
+    title: "Clutch desgastado — está patinando",
+    causes: [
+      { n: "n1", name: "Disco de clutch con material de fricción gastado", desc: "El material se ha consumido. El motor sube de RPM pero el carro no avanza de forma proporcional." },
+      { n: "n2", name: "Disco contaminado con aceite del retén trasero", desc: "Si hay fuga del retén trasero del motor, el aceite contamina el disco y lo hace patinar aunque tenga grosor." },
+      { n: "n3", name: "Plato de presión con resortes débiles", desc: "Los resortes del plato de presión pierden tensión por el calor acumulado de muchas operaciones." }
+    ],
+    actions: ["Prueba simple: en 3ra velocidad a baja velocidad, acelerar fuerte — si el motor sube pero el carro no, patina", "Revisar si hay olor a quemado al soltar el clutch en subida o con carga", "Revisar si hay fuga del retén trasero antes de cambiar el clutch", "Si hay aceite: cambiar retén trasero Y clutch al mismo tiempo — no hacerlo dos veces"],
+    note: "Un clutch desgastado puede fallar de repente en una subida con 40-50 toneladas. <strong>Si el clutch ya patina, programar el cambio antes de la próxima ruta larga.</strong> El trabajo incluye también revisar el volante del motor por rayaduras o calentamiento."
+  },
+  R_cl_no_libera: {
+    sev: "warning", sevLabel: "🟡 Ajustar o revisar",
+    title: "Clutch que no libera",
+    causes: [
+      { n: "n1", name: "Ajuste de clutch incorrecto", desc: "El clutch necesita ajuste periódico. Si el juego libre del pedal es muy pequeño, no libera completamente." },
+      { n: "n2", name: "Rodamiento de empuje (release bearing) dañado", desc: "El rodamiento que empuja el plato cuando pisas el pedal puede trabarse o romperse." },
+      { n: "n3", name: "Disco deformado por sobrecalentamiento", desc: "Un disco que se deformó por calor puede pegarse al volante o al plato de presión." }
+    ],
+    actions: ["Verificar el juego libre del pedal — en la mayoría de Kenworth debe ser de 38-50mm en el pedal", "Ajustar el clutch por el mecanismo de ajuste manual accesible en la campana", "Si al pisar el pedal a fondo no libera: el rodamiento de empuje puede estar dañado", "No forzar el cambio de velocidades si no libera completamente — se dañan los sincronizadores"],
+    note: "Los clutches de tractocamión tienen <strong>ajuste manual que se hace cada 10,000-15,000 km.</strong> Este ajuste lo puede hacer el mismo operador con una llave en carretera si conoce el procedimiento — es importante aprenderlo."
+  },
+  R_cl_ruido: {
+    sev: "warning", sevLabel: "🟡 Revisar en próximo servicio",
+    title: "Ruido al pisar el clutch",
+    causes: [
+      { n: "n1", name: "Rodamiento de empuje desgastado", desc: "El chiflido o rechinido que aparece exactamente al pisar el pedal casi siempre es este rodamiento." },
+      { n: "n2", name: "Resortes amortiguadores del disco rotos", desc: "Los resortes internos del disco hacen ruido metálico o traqueteo cuando se fracturan." },
+      { n: "n3", name: "Horquilla de desenganche desgastada", desc: "La horquilla que activa el rodamiento puede tener desgaste y generar ruido al moverse." }
+    ],
+    actions: ["Identificar si el ruido es AL PISAR o AL SOLTAR el pedal — cambia el diagnóstico", "Chiflido al pisar = rodamiento de empuje casi siempre", "Golpe o traqueteo al soltar = resortes del disco", "Ambos se reparan durante el cambio completo de clutch — aprovechar cuando toque"],
+    note: "El rodamiento de empuje es económico pero <strong>si se rompe completamente en carretera, el clutch no libera y el carro queda sin poder cambiar velocidades.</strong> Si ya chiría fuerte, no esperar al siguiente servicio."
+  },
+  R_cl_hidraulico: {
+    sev: "warning", sevLabel: "🟡 Revisar circuito hidráulico",
+    title: "Falla en el circuito hidráulico del clutch",
+    causes: [
+      { n: "n1", name: "Cilindro maestro de clutch sin líquido", desc: "El depósito de líquido hidráulico del clutch está bajo o vacío, sin presión no opera el sistema." },
+      { n: "n2", name: "Cilindro esclavo con fuga interna", desc: "El cilindro que activa la horquilla puede tener fuga interna y no generar suficiente presión." },
+      { n: "n3", name: "Línea hidráulica con fuga o rota", desc: "La línea entre el maestro y el esclavo puede tener fuga por vibración o corrosión." }
+    ],
+    actions: ["Revisar el depósito de líquido del clutch en la cabina — debajo del tablero o en la pared del motor", "Si está bajo: agregar líquido DOT 3 y ver si el pedal recupera resistencia", "Buscar gotas de líquido en el cilindro esclavo (parte inferior de la campana del motor)", "Si hay fuga: cambiar el cilindro afectado — no mezclar marcas de líquido"],
+    note: "El líquido DOT 3 absorbe humedad con el tiempo y su punto de ebullición baja. <strong>En uso intenso con subidas y carga pesada, el líquido degradado puede hervir y causar falla repentina del clutch.</strong> Cambiar el líquido cada 2 años."
+  },
+
+  // EJES
+  R_es_crucetas: {
+    sev: "warning", sevLabel: "🟡 Cambiar pronto — engrasar YA",
+    title: "Crucetas del cardán desgastadas",
+    causes: [
+      { n: "n1", name: "Crucetas del cardán sin grasa o desgastadas", desc: "Las crucetas transmiten la potencia a los ejes. Con carga pesada y sin engrase se desgastan muy rápido." },
+      { n: "n2", name: "Cruceta con juego — rodillos desgastados", desc: "Si al empujar el cardán de lado a lado hay movimiento, los rodillos de la cruceta ya están gastados." },
+      { n: "n3", name: "Cardán desbalanceado por cruceta mal instalada", desc: "Una cruceta instalada con inclinación incorrecta puede crear vibración y dañar el cardán completo." }
+    ],
+    actions: ["Revisar el juego en las crucetas: con el carro en neutro, empujar el cardán de lado a lado — no debe moverse", "Si hay movimiento o ruido seco al empujar, la cruceta necesita cambio urgente", "Engrasar TODAS las crucetas YA si no se ha hecho recientemente — con grasa de litio por el niple de engrase", "Cambiar crucetas antes de que se rompan — una cruceta rota en carretera puede romper el tubo del cardán y dañar el piso del trailer"],
+    note: "Las crucetas deben engrasarse <strong>cada 10,000 km o en cada servicio.</strong> Con las cargas de cemento y el peso que manejan los carros de la flota, el engrasado frecuente es la diferencia entre 200,000 km de vida útil y 50,000."
+  },
+  R_es_bujes: {
+    sev: "warning", sevLabel: "🟡 Revisar en próximo servicio",
+    title: "Bujes o chumaceras de eje desgastados",
+    causes: [
+      { n: "n1", name: "Bujes de hoja de muelle desgastados", desc: "Los bujes en los extremos de las hojas de muelle generan ruido y juego con el desgaste." },
+      { n: "n2", name: "Chumaceras del eje con desgaste", desc: "Las chumaceras que soportan el eje pueden crear vibración continua al rodar cuando se desgastan." },
+      { n: "n3", name: "Bujes de brazo de suspensión", desc: "Los brazos de la suspensión tienen bujes de hule o poliuretano que se desgastan bajo carga constante." }
+    ],
+    actions: ["Revisar visualmente si hay desgaste excesivo en los extremos de los muelles", "Con el carro levantado, mover las ruedas arriba/abajo y de lado — no debe haber juego", "Engrasar todos los puntos de suspensión con grasa de litio", "Los bujes de poliuretano se pueden cambiar sin quitar el eje completo"],
+    note: "El desgaste de bujes en una unidad que carga 40-50 toneladas es acelerado. <strong>Un buje gastado transfiere más carga al chasis y acelera el desgaste de otras piezas.</strong> Detectarlo a tiempo ahorra una reparación mayor."
+  },
+  R_es_muelles: {
+    sev: "warning", sevLabel: "🟡 Revisar antes de cargar",
+    title: "Muelles o bolsas de suspensión dañados",
+    causes: [
+      { n: "n1", name: "Hoja de muelle rota o fisurada", desc: "Las hojas de muelle de acero se pueden partir, especialmente la hoja principal que recibe más carga." },
+      { n: "n2", name: "Bolsa de aire de suspensión reventada", desc: "Si la bolsa se revienta, un lado del carro queda notablemente más bajo que el otro." },
+      { n: "n3", name: "Pernos en U del muelle flojos o rotos", desc: "Los pernos que sujetan el paquete de muelles al eje se pueden aflojar y el eje se desplaza." }
+    ],
+    actions: ["Comparar la altura de ambos lados del carro en plano — si uno está más bajo hay falla activa", "Revisar si alguna hoja de muelle tiene grieta visible o está separada del paquete", "Revisar que los pernos en U estén bien apretados al torque correcto", "Una bolsa reventada se ve claramente — hule negro deformado o con corte"],
+    note: "<strong>Los pernos en U de los muelles deben revisarse en cada servicio.</strong> Con las vibraciones de rutas de cantera y mina, se aflojan constantemente. Un muelle suelto puede hacer que el eje rote y cause un accidente grave."
+  },
+  R_es_piernas: {
+    sev: "warning", sevLabel: "🟡 Revisar",
+    title: "Piernas de eje (torque rods) dañadas",
+    causes: [
+      { n: "n1", name: "Torque rod con buje roto en los extremos", desc: "Las piernas que sostienen el eje contra las fuerzas de aceleración y frenado tienen bujes en ambos extremos." },
+      { n: "n2", name: "Torque rod doblada por golpe", desc: "Un golpe fuerte en bache o cuneta puede doblar las piernas, causando desalineación del eje." },
+      { n: "n3", name: "Perno de anclaje de torque rod flojo", desc: "Los pernos que anclan las piernas al chasis y al eje se pueden aflojar por la vibración." }
+    ],
+    actions: ["Revisar visualmente las piernas buscando deformación o grietas", "Con el carro en plano, verificar que el eje esté centrado respecto al chasis", "Revisar el estado de los bujes en ambos extremos de cada pierna", "Una torque rod doblada causa desgaste irregular y rápido de llantas — revisar el patrón de desgaste"],
+    note: "Con cargas de 40-50 toneladas, las fuerzas en los ejes son enormes. <strong>Las torque rods mantienen la geometría del eje bajo esas fuerzas.</strong> Si una falla, el eje se mueve y las llantas se desgastan desigualmente — costo alto en llantas a largo plazo."
+  },
+  R_es_balanceo: {
+    sev: "green", sevLabel: "🟢 No urgente",
+    title: "Desbalanceo de llantas o cardán",
+    causes: [
+      { n: "n1", name: "Llanta desbalanceada", desc: "Una llanta sin balancear vibra a velocidades específicas, generalmente entre 80-100 km/h." },
+      { n: "n2", name: "Cardán desbalanceado o doblado", desc: "El cardán puede perder un peso de balanceo o haberse doblado ligeramente en un golpe." },
+      { n: "n3", name: "Llanta con punto plano", desc: "Un frenón fuerte puede dejar un punto plano en la llanta que vibra a cualquier velocidad." }
+    ],
+    actions: ["Nota a qué velocidad vibra más — si es en un rango específico (ej. 80 km/h), es llanta", "Revisar visualmente las llantas buscando punto plano o bulto", "Si vibra a todas las velocidades, es más probable el cardán", "Balancear llantas en el próximo servicio — mejora también el rendimiento de combustible"],
+    note: "<strong>La vibración sostenida en un tractocamión afecta todas las partes roscadas y soldaduras de la unidad.</strong> Lo que parece molestia menor puede aflojar conexiones críticas y dañar la cabina a largo plazo. Atenderla pronto."
+  },
+
+  // RENDIMIENTO
+  R_br_operacion: {
+    sev: "green", sevLabel: "🟢 Ajuste operativo",
+    title: "Rendimiento bajo por factores de operación",
+    causes: [
+      { n: "n1", name: "Estilo de manejo con RPM alta", desc: "El Cummins ISX/X15 rinde mejor entre 1,200-1,500 RPM en crucero. Sobre 1,600 RPM el consumo sube." },
+      { n: "n2", name: "Presión de llantas incorrecta", desc: "Llantas bajas de presión generan resistencia al rodamiento. 20 PSI menos puede costar 3-5% de combustible." },
+      { n: "n3", name: "Ruta con topografía exigente o mucho tráfico", desc: "Las subidas y el tráfico afectan el rendimiento hasta un 30-40% comparado con ruta libre y plana." }
+    ],
+    actions: ["Revisar la presión de TODAS las llantas con manómetro en frío — incluyendo duales traseras", "Monitorear las RPM en ruta — mantener entre 1,200-1,500 RPM en velocidad de crucero", "Comparar rendimiento km/L por operador con el mismo carro — puede variar hasta 15%", "Usar el freno de motor en bajadas en vez de los frenos de aire — ahorra balatas y combustible"],
+    note: "En Cummins ISX, la zona de mayor eficiencia es el rango de torque máximo (1,000-1,400 RPM). <strong>Manejar en esa zona puede mejorar el rendimiento hasta 15%</strong> comparado con manejar a RPM más alta para la misma velocidad."
+  },
+  R_br_inyectores_turbo: {
+    sev: "warning", sevLabel: "🟡 Diagnóstico en taller",
+    title: "Bajo rendimiento por inyectores o turbo",
+    causes: [
+      { n: "n1", name: "Inyectores con atomización deficiente", desc: "El diesel no se quema completamente — se desperdicia combustible y sube el consumo." },
+      { n: "n2", name: "Turbo no llegando a su presión nominal", desc: "El motor necesita más diesel para compensar la falta de presión del turbo." },
+      { n: "n3", name: "Filtro de aire tapado", desc: "Menos aire significa combustión incompleta y más diesel por kilómetro recorrido." }
+    ],
+    actions: ["Cambiar filtro de aire primero — más barato y muchas veces resuelve el problema", "Con INSITE, monitorear la presión del turbo en tiempo real bajo carga completa", "Hacer prueba de balance de cilindros para detectar si algún inyector está fallando", "Si la presión del turbo es baja: revisar actuador VGT y hacer calibración"],
+    note: "Un carro que rendía 3.5 km/L y bajó a 2.8 km/L sin explicación visible casi siempre es inyectores o turbo. <strong>Con 6 unidades de flota, esa diferencia representa decenas de miles de pesos al mes solo en diesel.</strong>"
+  },
+  R_br_filtros: {
+    sev: "green", sevLabel: "🟢 Mantenimiento preventivo",
+    title: "Filtros o presión de llantas",
+    causes: [
+      { n: "n1", name: "Filtro de combustible tapado", desc: "El motor no recibe el caudal de diesel que necesita y trabaja de forma ineficiente." },
+      { n: "n2", name: "Llantas bajas de presión", desc: "La resistencia al rodamiento con llantas bajas puede costar hasta 5% del consumo total." },
+      { n: "n3", name: "Frenos mal ajustados (arrastrando)", desc: "Un freno que no libera completamente genera calor y resistencia constante, sube el consumo." }
+    ],
+    actions: ["Revisar la presión de todas las llantas con manómetro — especialmente traseras duales", "Cambiar filtros de combustible primario y secundario", "Después de 20 km de ruta, tocar las manzanas de rueda — si alguna está caliente, el freno arrastra", "Registrar km/L antes y después del mantenimiento para medir la mejora real"],
+    note: "Llevar registro de km/L por unidad y por operador es clave para detectar problemas temprano. <strong>Una caída del 10% en rendimiento, antes de que haya síntomas visibles, ya indica que algo está empezando a fallar.</strong> El dashboard que construiste es perfecto para esto."
+  },
+
+  // POST REPARACIÓN
+  R_pr_calibracion: {
+    sev: "warning", sevLabel: "🟡 Falta calibración post-instalación",
+    title: "Inyectores nuevos sin calibrar en el módulo",
+    causes: [
+      { n: "n1", name: "Códigos IQA de inyectores no programados", desc: "Cada inyector Cummins tiene un código individual (IQA). El módulo necesita ese código para compensar variaciones entre inyectores." },
+      { n: "n2", name: "Ajuste de válvulas no hecho post-cabeza", desc: "Después de cambiar la cabeza del motor, el ajuste de válvulas es obligatorio — sin él el motor no tiene la potencia correcta." },
+      { n: "n3", name: "Fuga de aire en admisión post-armado", desc: "Una manguera no bien conectada al armar el motor puede hacer que el motor trabaje al 70% de su capacidad." }
+    ],
+    actions: ["Conectar Cummins INSITE y programar los códigos IQA de cada inyector nuevo — están grabados en el cuerpo del inyector", "Hacer ajuste de válvulas si se cambió la cabeza — es obligatorio en Cummins", "Revisar TODAS las mangueras de turbo, intercooler y admisión — que no haya nada mal conectado", "Revisar que no haya fugas de aire haciendo silbido con el motor encendido"],
+    note: "Este es uno de los errores más comunes post-reparación. Los inyectores se instalan pero <strong>no se programan sus códigos IQA en el módulo.</strong> El motor funciona pero nunca llega a su potencia real hasta hacer esa calibración. Simple de resolver con INSITE."
+  },
+  R_pr_fugas: {
+    sev: "warning", sevLabel: "🟡 Revisión completa post-armado",
+    title: "Fuga de aire post-reparación mayor",
+    causes: [
+      { n: "n1", name: "Manguera de turbo no bien conectada", desc: "Al desarmar el motor se quitan todas las mangueras. Si alguna no queda firme, hay pérdida de presión de turbo." },
+      { n: "n2", name: "Junta de múltiple de admisión o escape mal puesta", desc: "Las juntas del múltiple son fáciles de pasar por alto. Una fuga en admisión baja potencia directamente." },
+      { n: "n3", name: "Ajuste de válvulas no realizado", desc: "Después de una reparación mayor, las válvulas deben ajustarse. Sin ajuste el motor no tiene la compresión correcta." }
+    ],
+    actions: ["Revisar visualmente TODAS las mangueras de turbo, intercooler y admisión", "Con motor encendido, escuchar si hay silbido en el área de los múltiples", "Verificar el torque de los pernos del múltiple de admisión", "Confirmar que se realizó el ajuste de válvulas post-armado — si no, hacerlo cuanto antes"],
+    note: "Después de una reparación mayor, <strong>siempre hacer una revisión completa de todas las conexiones antes de salir al camino.</strong> Una fuga pequeña que parece menor puede hacer que el motor trabaje al 70% de su capacidad y dañe los componentes recién instalados."
+  },
+  R_pr_turbo: {
+    sev: "warning", sevLabel: "🟡 Verificar instalación del turbo",
+    title: "Verificación de turbo nuevo instalado",
+    causes: [
+      { n: "n1", name: "Línea de aceite del turbo no cebada antes del arranque", desc: "Si no se llenó la línea de aceite antes de arrancar, el turbo trabajó en seco los primeros segundos." },
+      { n: "n2", name: "Actuador VGT no calibrado post-instalación", desc: "El actuador del turbo variable necesita calibración con INSITE después de cada instalación." },
+      { n: "n3", name: "Sensor MAP o manguera de presión no conectados", desc: "Si la manguera del sensor de presión del turbo no quedó bien, el módulo no puede controlar el turbo." }
+    ],
+    actions: ["Verificar que se llenó la línea de aceite del turbo ANTES del primer arranque", "En el primer arranque: dejar el motor al ralentí 5 minutos sin acelerar para que lubrique bien", "Con Cummins INSITE, calibrar el actuador VGT si es turbo variable", "Monitorear la presión del turbo en tiempo real con INSITE en el primer rodaje con carga"],
+    note: "Un turbo nuevo tiene un período de rodaje. <strong>Los primeros 500 km no someter el motor a cargas máximas.</strong> Esto permite que los nuevos cojinetes del turbo se asienten correctamente con el aceite de lubricación."
+  }
+};
+
+// ============================================================
+// APP ENGINE
+// ============================================================
+let state = { symptom: null, qHistory: [], currentQ: null };
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startDiag(symptomId) {
+  state = { symptom: symptomId, qHistory: [], currentQ: null };
+  const data = diagData[symptomId];
+  showQuestion(data.questions.start);
+  showScreen('question');
+}
+
+function showQuestion(qId) {
+  state.currentQ = qId;
+  const data = diagData[state.symptom];
+  const q = data.questions[qId];
+  const qKeys = Object.keys(data.questions).filter(k => k !== 'start');
+  const progress = Math.max(15, Math.min(90, (state.qHistory.length / Math.max(qKeys.length, 1)) * 85 + 15));
+  document.getElementById('progress-fill').style.width = progress + '%';
+  document.getElementById('progress-label').textContent = 'Pregunta ' + (state.qHistory.length + 1);
+  document.getElementById('q-badge').textContent = data.label;
+  document.getElementById('q-text').textContent = q.text;
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span>${opt.label}</span><span class="option-arrow">›</span>`;
+    btn.onclick = () => handleAnswer(opt.next);
+    container.appendChild(btn);
+  });
+}
+
+function handleAnswer(next) {
+  state.qHistory.push(state.currentQ);
+  if (next.startsWith('R_')) { showResult(next); } else { showQuestion(next); }
+}
+
+function goBack() {
+  if (state.qHistory.length === 0) { goHome(); return; }
+  const prev = state.qHistory.pop();
+  showQuestion(prev);
+}
+
+function goHome() {
+  state = { symptom: null, qHistory: [], currentQ: null };
+  showScreen('home');
+}
+
+function showResult(rId) {
+  const r = results[rId];
+  if (!r) { goHome(); return; }
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-label').textContent = 'Diagnóstico listo';
+  const sevEl = document.getElementById('r-sev');
+  sevEl.textContent = r.sevLabel;
+  sevEl.className = 'sev-badge ' + r.sev;
+  document.getElementById('r-title').textContent = r.title;
+  const rankClass = ['n1','n2','n3'];
+  document.getElementById('r-causes').innerHTML = r.causes.map((c,i) =>
+    `<div class="cause-card"><div class="cause-head"><div class="cause-num ${rankClass[i]}">${i+1}</div><div class="cause-name">${c.name}</div></div><div class="cause-desc">${c.desc}</div></div>`
+  ).join('');
+  document.getElementById('r-actions').innerHTML = r.actions.map((a,i) =>
+    `<div class="action-item"><div class="action-num">${i+1}</div><div class="action-text">${a}</div></div>`
+  ).join('');
+  document.getElementById('r-note').innerHTML = `<p>💡 ${r.note}</p>`;
+  showScreen('result');
+}
+</script>
+</body>
+</html>
